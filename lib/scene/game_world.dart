@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart';
+import 'package:home_runner/components/platform.dart';
 import 'package:home_runner/components/player.dart';
 
-class GameWorld extends World with HasCollisionDetection {
+class GameWorld extends World{
   final String mapName;
 
   GameWorld({required this.mapName}) :super();
@@ -26,6 +27,8 @@ class GameWorld extends World with HasCollisionDetection {
         .tileMap
         .getLayer<ObjectGroup>("Platforms");
     for (final obj in platform!.objects) {
+      final plat = PlatForm(position: Vector2(obj.x, obj.y), size: Vector2(obj.width, obj.height));
+      add(plat);
     }
 
     final spawnPoint = _tiledComponent

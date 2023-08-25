@@ -3,10 +3,22 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "map1.tmx",
     "expandedProjectPaths": [
     ],
     "fileStates": {
+        "Terrain (16x16).tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "map1.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 103.33333333333331,
+                "y": 182.66666666666666
+            }
+        }
     },
     "last.imagePath": "C:/Developer/Flutter/home_runner/assets/images/terrain",
     "map.lastUsedFormat": "tmx",
@@ -14,9 +26,13 @@
     "map.tileWidth": 16,
     "map.width": 120,
     "openFiles": [
+        "Terrain (16x16).tsx",
+        "map1.tmx"
     ],
     "project": "HomeRunner.tiled-project",
     "recentFiles": [
+        "Terrain (16x16).tsx",
+        "map1.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
