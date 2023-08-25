@@ -1,0 +1,1 @@
+enum PlayerAnimeState{running, idle}
