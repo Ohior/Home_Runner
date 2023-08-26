@@ -1,28 +1,43 @@
 import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
+import 'package:flame/experimental.dart';
+import 'package:flame/extensions.dart';
+import 'package:home_runner/components/obj_pos_provider.dart';
 import 'package:home_runner/components/platform.dart';
 import 'package:home_runner/main_game.dart';
 import 'package:home_runner/utils/enum_states.dart';
 
 class Player extends SpriteAnimationGroupComponent
     with HasGameRef<MainGame>, CollisionCallbacks {
+
+  final Rect levelBounds;
+  Player({required position, required size, required this.levelBounds})
+      : super(position: position, size: size){
+    _minClamp = levelBounds.topLeft.toVector2() + (size!);
+    _maxClamp = levelBounds.bottomRight.toVector2() - (size);
+  }
+
   final Vector2 _up = Vector2(0, -1);
-
-  Player({required position, required size})
-      : super(position: position, size: size);
-
   final Vector2 _velocity = Vector2.zero();
-  final double _moveSpeed = 200;
-  int _hAxisInput = 0;
+  late final Vector2 _minClamp;
+  late final Vector2 _maxClamp;
+  final double _moveSpeed = 100;
   final double _gravity = 10;
-  final double _jumpSpeed = 320;
+  final double _jumpSpeed = 250;
+
   static bool jumpInput = false;
-  static bool _isOnGround = false;
+
+  int _hAxisInput = 0;
+  static bool isOnGround = false;
+  bool _isFirstRun = true;
 
   @override
   FutureOr<void> onLoad() async {
     _loadAnimations();
+
+    _setUpCamera();
 
     add(CircleHitbox());
     return super.onLoad();
@@ -33,16 +48,29 @@ class Player extends SpriteAnimationGroupComponent
     _velocity.x = _hAxisInput * _moveSpeed;
     _velocity.y += _gravity;
 
-    if(jumpInput){
-      if(_isOnGround){
-      _velocity.y = -_jumpSpeed;
-        _isOnGround = false;
+    if(isOnGround){
+      if(_isFirstRun){
+        _isFirstRun = false;
+        _hAxisInput = 1;
       }
-      jumpInput = false;
+      if(jumpInput){
+        _velocity.y = -_jumpSpeed;
+        isOnGround = false;
+        jumpInput = false;
+      }
     }
+
+    // if(jumpInput){
+    //   if(_isOnGround){
+    //   _velocity.y = -_jumpSpeed;
+    //     _isOnGround = false;
+    //   }
+    //   jumpInput = false;
+    // }
     _velocity.y = _velocity.y.clamp(-_jumpSpeed, 150);
 
     position += _velocity * dt;
+    position.clamp(_minClamp, _maxClamp);
     super.update(dt);
   }
 
@@ -58,7 +86,8 @@ class Player extends SpriteAnimationGroupComponent
 
         collisionNormal.normalize();
         if(_up.dot(collisionNormal) > 0.9){
-          _isOnGround = true;
+          isOnGround = true;
+          //_hAxisInput = 1;
         }
 
         position += collisionNormal.scaled(separationDistance);
@@ -81,5 +110,12 @@ class Player extends SpriteAnimationGroupComponent
         gameRef.images.fromCache('characters/$state 48x48.png'),
         SpriteAnimationData.sequenced(
             amount: frameNum, stepTime: 0.07, textureSize: Vector2.all(48)));
+  }
+
+  void _setUpCamera() {
+    // gameRef.cameraComponent.viewport.camera.follow(this, horizontalOnly: true, snap: false);
+    // gameRef.;
+    // gameRef.cameraComponent.follow(ObjectPositionProvider(position: position), horizontalOnly: true, snap: false);
+    gameRef.camera.followComponent(this, worldBounds: levelBounds);
   }
 }
